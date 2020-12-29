@@ -202,6 +202,7 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
         # We rotate the returned position, so it's ready for the next player
         return Position(board, score, wc, bc, ep, kp).rotate()
 
+# Scoring logic
     def value(self, move):
         i, j = move
         p, q = self.board[i], self.board[j]
