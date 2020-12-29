@@ -474,7 +474,7 @@ def main():
             119-move[0]) + render(119-move[1])
 
         print(
-            "Computer - {0}:{1} (terminal positions: {2})".format(movecount, computermove, scorecount))
+            "Computer - {0}:{1} (depth: {2}, terminal positions: {3})".format(movecount, computermove, _depth, scorecount))
 
         hist.append(hist[-1].move(move))
 
