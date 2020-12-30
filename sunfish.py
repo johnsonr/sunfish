@@ -9,6 +9,11 @@ from itertools import count
 from collections import namedtuple
 
 ###############################################################################
+# Config
+###############################################################################
+secondstothink = 5
+
+###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
 ###############################################################################
 
@@ -461,7 +466,7 @@ def main():
         # Fire up the engine to look for a move.
         start = time.time()
         for _depth, move, score in searcher.search(hist[-1], hist):
-            if time.time() - start > 1:
+            if time.time() - start > secondstothink:
                 break
 
         if score == MATE_UPPER:
@@ -474,10 +479,9 @@ def main():
             119-move[0]) + render(119-move[1])
 
         print(
-            "Computer - {0}:{1} (depth: {2}, terminal positions: {3})".format(movecount, computermove, _depth, scorecount))
+            "Computer - {0}:{1} (score: {2} depth: {3}, terminal positions: {4})".format(movecount, computermove, score, _depth, scorecount))
 
         hist.append(hist[-1].move(move))
-
         movecount = movecount + 1
 
 
