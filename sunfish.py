@@ -124,9 +124,6 @@ EVAL_ROUGHNESS = 13
 DRAW_TEST = True
 
 
-scorecount = 0
-
-
 ###############################################################################
 # Chess logic
 ###############################################################################
@@ -226,8 +223,6 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
 
 # Scoring logic
     def value(self, move):
-        global scorecount
-        scorecount = scorecount + 1
         i, j = move
         p, q = self.board[i], self.board[j]
         # Actual move
@@ -479,7 +474,7 @@ def main():
             119-move[0]) + render(119-move[1])
 
         print(
-            "Computer - {0}:{1} (score: {2} depth: {3}, terminal positions: {4})".format(movecount, computermove, score, _depth, scorecount))
+            "Computer - {0}:{1} (score: {2} depth: {3}, terminal positions: {4})".format(movecount, computermove, score, _depth, searcher.nodes))
 
         hist.append(hist[-1].move(move))
         movecount = movecount + 1
