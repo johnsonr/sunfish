@@ -344,6 +344,7 @@ def main():
         # After our move we rotate the board and print it again.
         # This allows us to see the effect of our move.
         print_pos(hist[-1].rotate())
+        # print(hist[-1].rotate().board)
 
         if hist[-1].score <= -MATE_LOWER:
             print("You won")
@@ -360,11 +361,10 @@ def main():
 
         # The black player moves from a rotated position, so we have to
         # 'back rotate' the move before printing it.
-
         computermove = render(119-move[0]) + render(119-move[1])
         print(
-            "Computer - {0}:{1} (score: {2}, depth: {3}, terminal positions: {4})"
-            .format(len(hist), computermove, score, _depth, terminals))
+            "Computer - {0:.0f}:{1} (score: {2}, depth: {3}, terminal positions: {4})"
+            .format(len(hist) / 2, computermove, -score, _depth, terminals))
 
         hist.append(hist[-1].move(move))
 
