@@ -7,13 +7,14 @@ import sys
 import time
 from itertools import count
 from collections import namedtuple
-from piece import piece, initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8
-from simple_eval import simple_evaluator
+from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8
+from evaluator import Evaluator
+from simple_eval import SimpleEvaluator
 
 ###############################################################################
 # Configuration
 ###############################################################################
-secondstothink = 2
+secondstothink = 1
 
 
 ###############################################################################
@@ -43,6 +44,8 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
     ep - the en passant square
     kp - the king passant square
     """
+
+    evaluator = SimpleEvaluator()
 
     def gen_moves(self):
         # For each of our pieces, iterate through each possible 'ray' of moves,
@@ -129,7 +132,7 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
 
     # Scoring function
     def value(self, move):
-        return simple_evaluator(self, move)
+        return self.evaluator.score(self, move)
 
 ###############################################################################
 # Search logic
@@ -255,7 +258,7 @@ class Searcher:
 
         return best
 
-    def search(self, pos, history=()):
+    def search(self, pos, evaluator, history=()):
         """ Iterative deepening MTD-bi search """
         self.nodes = 0
         if DRAW_TEST:
@@ -345,7 +348,7 @@ def main():
 
         # Fire up the engine to look for a move.
         start = time.time()
-        for _depth, move, score in searcher.search(hist[-1], hist):
+        for _depth, move, score in searcher.search(hist[-1], SimpleEvaluator, hist):
             if time.time() - start > secondstothink:
                 break
 

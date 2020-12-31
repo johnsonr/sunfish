@@ -1,4 +1,5 @@
 from piece import piece, S, A1, A8, H8, H1
+from evaluator import Evaluator
 
 ###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
@@ -62,25 +63,27 @@ for k, table in pst.items():
     pst[k] = (0,)*20 + pst[k] + (0,)*20
 
 
-def simple_evaluator(pos, move):
-    i, j = move
-    p, q = pos.board[i], pos.board[j]
-    # Actual move
-    score = pst[p][j] - pst[p][i]
-    # Capture
-    if q.islower():
-        score += pst[q.upper()][119-j]
-    # Castling check detection
-    if abs(j-pos.kp) < 2:
-        score += pst['K'][119-j]
-    # Castling
-    if p == 'K' and abs(i-j) == 2:
-        score += pst['R'][(i+j)//2]
-        score -= pst['R'][A1 if j < i else H1]
-    # Special pawn stuff
-    if p == 'P':
-        if A8 <= j <= H8:
-            score += pst['Q'][j] - pst['P'][j]
-        if j == pos.ep:
-            score += pst['P'][119-(j+S)]
-    return score
+class SimpleEvaluator(Evaluator):
+
+    def score(self, pos, move):
+        i, j = move
+        p, q = pos.board[i], pos.board[j]
+        # Actual move
+        score = pst[p][j] - pst[p][i]
+        # Capture
+        if q.islower():
+            score += pst[q.upper()][119-j]
+        # Castling check detection
+        if abs(j-pos.kp) < 2:
+            score += pst['K'][119-j]
+        # Castling
+        if p == 'K' and abs(i-j) == 2:
+            score += pst['R'][(i+j)//2]
+            score -= pst['R'][A1 if j < i else H1]
+        # Special pawn stuff
+        if p == 'P':
+            if A8 <= j <= H8:
+                score += pst['Q'][j] - pst['P'][j]
+            if j == pos.ep:
+                score += pst['P'][119-(j+S)]
+        return score
