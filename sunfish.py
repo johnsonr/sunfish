@@ -35,7 +35,7 @@ DRAW_TEST = True
 # Chess logic
 ###############################################################################
 
-class Position(namedtuple('Position', 'board score wc bc ep kp')):
+class Position(namedtuple('Position', 'board score wc bc ep kp evaluator')):
     """ A state of a chess game
     board -- a 120 char representation of the board
     score -- the board evaluation
@@ -44,8 +44,6 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
     ep - the en passant square
     kp - the king passant square
     """
-
-    evaluator = SimpleEvaluator()
 
     def gen_moves(self):
         # For each of our pieces, iterate through each possible 'ray' of moves,
@@ -84,13 +82,15 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
         return Position(
             self.board[::-1].swapcase(), -self.score, self.bc, self.wc,
             119-self.ep if self.ep else 0,
-            119-self.kp if self.kp else 0)
+            119-self.kp if self.kp else 0,
+            self.evaluator)
 
     def nullmove(self):
         ''' Like rotate, but clears ep and kp '''
         return Position(
             self.board[::-1].swapcase(), -self.score,
-            self.bc, self.wc, 0, 0)
+            self.bc, self.wc, 0, 0,
+            self.evaluator)
 
     def move(self, move):
         i, j = move
@@ -128,7 +128,7 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
             if j == self.ep:
                 board = put(board, j+S, '.')
         # We rotate the returned position, so it's ready for the next player
-        return Position(board, score, wc, bc, ep, kp).rotate()
+        return Position(board, score, wc, bc, ep, kp, self.evaluator).rotate()
 
     # Scoring function
     def value(self, move):
@@ -261,6 +261,7 @@ class Searcher:
     def search(self, pos, evaluator, history=()):
         """ Iterative deepening MTD-bi search """
         self.nodes = 0
+        alreadyEvaluated = evaluator.terminals()
         if DRAW_TEST:
             self.history = set(history)
             # print('# Clearing table due to new history')
@@ -286,7 +287,7 @@ class Searcher:
             self.bound(pos, lower, depth)
             # If the game hasn't finished we can retrieve our move from the
             # transposition table.
-            yield depth, self.tp_move.get(pos), self.tp_score.get((pos, depth, True)).lower
+            yield depth, self.tp_move.get(pos), self.tp_score.get((pos, depth, True)).lower, evaluator.terminals() - alreadyEvaluated
 
 
 ###############################################################################
@@ -318,7 +319,9 @@ def print_pos(pos):
 
 
 def main():
-    hist = [Position(initial, 0, (True, True), (True, True), 0, 0)]
+    evaluator = SimpleEvaluator()
+    hist = [Position(initial, 0, (True, True),
+                     (True, True), 0, 0, evaluator)]
     searcher = Searcher()
     while True:
         print_pos(hist[-1])
@@ -348,7 +351,7 @@ def main():
 
         # Fire up the engine to look for a move.
         start = time.time()
-        for _depth, move, score in searcher.search(hist[-1], SimpleEvaluator, hist):
+        for _depth, move, score, terminals in searcher.search(hist[-1], evaluator, hist):
             if time.time() - start > secondstothink:
                 break
 
@@ -359,9 +362,9 @@ def main():
         # 'back rotate' the move before printing it.
 
         computermove = render(119-move[0]) + render(119-move[1])
-        terminals = 0
         print(
-            "Computer - {0}:{1} (score: {2} depth: {3}, terminal positions: {4})".format(len(hist), computermove, score, _depth, terminals))
+            "Computer - {0}:{1} (score: {2}, depth: {3}, terminal positions: {4})"
+            .format(len(hist), computermove, score, _depth, terminals))
 
         hist.append(hist[-1].move(move))
 

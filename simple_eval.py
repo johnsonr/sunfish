@@ -65,7 +65,11 @@ for k, table in pst.items():
 
 class SimpleEvaluator(Evaluator):
 
+    terminalsSeen = 0
+
     def score(self, pos, move):
+        self.terminalsSeen = self.terminalsSeen + 1
+
         i, j = move
         p, q = pos.board[i], pos.board[j]
         # Actual move
@@ -87,3 +91,6 @@ class SimpleEvaluator(Evaluator):
             if j == pos.ep:
                 score += pst['P'][119-(j+S)]
         return score
+
+    def terminals(self):
+        return self.terminalsSeen
