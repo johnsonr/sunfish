@@ -221,28 +221,9 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
         # We rotate the returned position, so it's ready for the next player
         return Position(board, score, wc, bc, ep, kp).rotate()
 
+    # Scoring function
     def value(self, move):
-        i, j = move
-        p, q = self.board[i], self.board[j]
-        # Actual move
-        score = pst[p][j] - pst[p][i]
-        # Capture
-        if q.islower():
-            score += pst[q.upper()][119-j]
-        # Castling check detection
-        if abs(j-self.kp) < 2:
-            score += pst['K'][119-j]
-        # Castling
-        if p == 'K' and abs(i-j) == 2:
-            score += pst['R'][(i+j)//2]
-            score -= pst['R'][A1 if j < i else H1]
-        # Special pawn stuff
-        if p == 'P':
-            if A8 <= j <= H8:
-                score += pst['Q'][j] - pst['P'][j]
-            if j == self.ep:
-                score += pst['P'][119-(j+S)]
-        return score
+        return simple_evaluator(self, move)
 
 ###############################################################################
 # Search logic
@@ -251,6 +232,30 @@ class Position(namedtuple('Position', 'board score wc bc ep kp')):
 
 # lower <= s(pos) <= upper
 Entry = namedtuple('Entry', 'lower upper')
+
+
+def simple_evaluator(pos, move):
+    i, j = move
+    p, q = pos.board[i], pos.board[j]
+    # Actual move
+    score = pst[p][j] - pst[p][i]
+    # Capture
+    if q.islower():
+        score += pst[q.upper()][119-j]
+    # Castling check detection
+    if abs(j-pos.kp) < 2:
+        score += pst['K'][119-j]
+    # Castling
+    if p == 'K' and abs(i-j) == 2:
+        score += pst['R'][(i+j)//2]
+        score -= pst['R'][A1 if j < i else H1]
+    # Special pawn stuff
+    if p == 'P':
+        if A8 <= j <= H8:
+            score += pst['Q'][j] - pst['P'][j]
+        if j == pos.ep:
+            score += pst['P'][119-(j+S)]
+    return score
 
 
 class Searcher:
