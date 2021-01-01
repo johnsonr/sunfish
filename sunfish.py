@@ -10,14 +10,14 @@ from itertools import count
 from collections import namedtuple
 from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8
 from evaluator import Evaluator
-from simple_eval import SimpleEvaluator
+from simple_eval import SimpleEvaluator, mustBeAbleToCastle
 import sys
 
 ###############################################################################
 # Configuration
 ###############################################################################
 # First argument is number of seconds
-seconds_to_think = sys.argv[1] if len(sys.argv) > 1 else 1
+seconds_to_think = int(sys.argv[1]) if len(sys.argv) > 1 else 1
 
 ###############################################################################
 # Global constants
@@ -321,7 +321,10 @@ def print_pos(pos):
 
 
 def main():
-    evaluator = SimpleEvaluator()
+    evaluator = SimpleEvaluator([
+        mustBeAbleToCastle
+    ]
+    )
     hist = [Position(initial, 0, (True, True),
                      (True, True), 0, 0, evaluator)]
 
@@ -378,10 +381,9 @@ def main():
 
         hist.append(hist[-1].move(move))
 
-        for row in hist[-1]:
-            for elem in row:
-                print(row, ":", elem, end=' ')
-            print()
+        # for rownum, row in enumerate(hist[-1].board):
+        #     for colnum, sq in enumerate(row):
+        #         print("{0}:{1}-{2}".format(rownum, colnum, sq), end=' ')
 
 
 if __name__ == '__main__':

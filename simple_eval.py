@@ -63,9 +63,16 @@ for k, table in pst.items():
     pst[k] = (0,)*20 + pst[k] + (0,)*20
 
 
+# A rule is a function taking position and move, producing a delta
+
 class SimpleEvaluator(Evaluator):
 
     terminalsSeen = 0
+
+    rules = []
+
+    def __init__(self, rules):
+        self.rules = rules
 
     def score(self, pos, move):
         self.terminalsSeen = self.terminalsSeen + 1
@@ -73,11 +80,11 @@ class SimpleEvaluator(Evaluator):
         i, j = move
         pieceMoved, destinationSquareOccupant = pos.board[i], pos.board[j]
 
-        # print(pieceMoved, destinationSquareOccupant)
+        ##print(i, j, pieceMoved, destinationSquareOccupant)
 
         # Actual move
         score = pst[pieceMoved][j] - pst[pieceMoved][i]
-        # Capture
+        # Capture of a black piece
         if destinationSquareOccupant.islower():
             score += pst[destinationSquareOccupant.upper()][119-j]
         # Castling check detection
@@ -93,7 +100,19 @@ class SimpleEvaluator(Evaluator):
                 score += pst['Q'][j] - pst['P'][j]
             if j == pos.ep:
                 score += pst['P'][119-(j+S)]
+
+        # Apply rules
+        delta = 0
+        for rule in self.rules:
+            delta += rule(pos, move)
+        # print("Delta from {0} rules is {1}".format(len(self.rules), delta))
+        score += delta
+
         return score
 
     def terminals(self):
         return self.terminalsSeen
+
+
+def mustBeAbleToCastle(pos, move):
+    return 0
