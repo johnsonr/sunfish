@@ -71,21 +71,24 @@ class SimpleEvaluator(Evaluator):
         self.terminalsSeen = self.terminalsSeen + 1
 
         i, j = move
-        p, q = pos.board[i], pos.board[j]
+        pieceMoved, destinationSquareOccupant = pos.board[i], pos.board[j]
+
+        # print(pieceMoved, destinationSquareOccupant)
+
         # Actual move
-        score = pst[p][j] - pst[p][i]
+        score = pst[pieceMoved][j] - pst[pieceMoved][i]
         # Capture
-        if q.islower():
-            score += pst[q.upper()][119-j]
+        if destinationSquareOccupant.islower():
+            score += pst[destinationSquareOccupant.upper()][119-j]
         # Castling check detection
         if abs(j-pos.kp) < 2:
             score += pst['K'][119-j]
         # Castling
-        if p == 'K' and abs(i-j) == 2:
+        if pieceMoved == 'K' and abs(i-j) == 2:
             score += pst['R'][(i+j)//2]
             score -= pst['R'][A1 if j < i else H1]
         # Special pawn stuff
-        if p == 'P':
+        if pieceMoved == 'P':
             if A8 <= j <= H8:
                 score += pst['Q'][j] - pst['P'][j]
             if j == pos.ep:

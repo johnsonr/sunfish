@@ -4,7 +4,8 @@
 from __future__ import print_function
 import re
 import sys
-import time
+from time import time
+
 from itertools import count
 from collections import namedtuple
 from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8
@@ -14,7 +15,7 @@ from simple_eval import SimpleEvaluator
 ###############################################################################
 # Configuration
 ###############################################################################
-secondstothink = 1
+seconds_to_think = 2
 
 
 ###############################################################################
@@ -351,9 +352,13 @@ def main():
             break
 
         # Fire up the engine to look for a move.
-        start = time.time()
+        start = int(time() * 1000)
+        elapsed_time_millis = 0
+        milliseconds_to_think = 1000 * seconds_to_think
         for _depth, move, score, terminals in searcher.search(hist[-1], evaluator, hist):
-            if time.time() - start > secondstothink:
+            timenow = int(time() * 1000)
+            elapsed_time_millis = timenow - start
+            if elapsed_time_millis > milliseconds_to_think:
                 break
 
         if score == MATE_UPPER:
@@ -363,8 +368,9 @@ def main():
         # 'back rotate' the move before printing it.
         computermove = render(119-move[0]) + render(119-move[1])
         print(
-            "Computer - {0:.0f}:{1} (score: {2}, depth: {3}, terminal positions: {4})"
-            .format(len(hist) / 2, computermove, -score, _depth, terminals))
+            "Computer - {0:.0f}:{1} (score: {2}, depth: {3}, terminal positions: {4}, {5:.0f} terminals/second)"
+            .format(len(hist) / 2, computermove, -score, _depth, terminals,
+                    terminals / elapsed_time_millis * 1000))
 
         hist.append(hist[-1].move(move))
 

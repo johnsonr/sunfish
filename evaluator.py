@@ -7,6 +7,6 @@ class Evaluator(ABC):
     def score(pos, move):
         pass
 
-    # @abstractmethod
-    # def terminals(self):
-    #     pass
+    @abstractmethod
+    def terminals(self):
+        pass
