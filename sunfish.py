@@ -16,6 +16,7 @@ import sys
 ###############################################################################
 # Configuration
 ###############################################################################
+# First argument is number of seconds
 seconds_to_think = sys.argv[1] if len(sys.argv) > 1 else 1
 
 ###############################################################################
@@ -379,7 +380,7 @@ def main():
 
         for row in hist[-1]:
             for elem in row:
-                print(elem, end=' ')
+                print(row, ":", elem, end=' ')
             print()
 
 
