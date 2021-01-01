@@ -65,7 +65,7 @@ for k, table in pst.items():
 
 # A rule is a function taking position and move, producing a delta
 
-class SimpleEvaluator(Evaluator):
+class RuleBasedEvaluator(Evaluator):
 
     terminalsSeen = 0
 
