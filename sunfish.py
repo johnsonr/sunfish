@@ -11,12 +11,12 @@ from collections import namedtuple
 from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8
 from evaluator import Evaluator
 from simple_eval import SimpleEvaluator
+import sys
 
 ###############################################################################
 # Configuration
 ###############################################################################
-seconds_to_think = 3
-
+seconds_to_think = sys.argv[1] if len(sys.argv) > 1 else 1
 
 ###############################################################################
 # Global constants
@@ -323,6 +323,8 @@ def main():
     evaluator = SimpleEvaluator()
     hist = [Position(initial, 0, (True, True),
                      (True, True), 0, 0, evaluator)]
+
+    print("Seconds to think:", seconds_to_think)
     searcher = Searcher()
     while True:
         print_pos(hist[-1])
@@ -374,6 +376,11 @@ def main():
                     terminals / elapsed_time_millis * 1000))
 
         hist.append(hist[-1].move(move))
+
+        for row in hist[-1]:
+            for elem in row:
+                print(elem, end=' ')
+            print()
 
 
 if __name__ == '__main__':

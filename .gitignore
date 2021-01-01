@@ -1,5 +1,7 @@
 *.py[cod]
 
+.vscode/
+
 # Sunfish files
 *.log
 *.txt
