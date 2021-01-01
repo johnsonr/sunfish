@@ -368,8 +368,9 @@ def main():
         # 'back rotate' the move before printing it.
         computermove = render(119-move[0]) + render(119-move[1])
         print(
-            "Computer - {0:.0f}:{1} (score: {2}, depth: {3}, terminal positions: {4}, {5:.0f} terminals/second)"
+            "Computer - {0:.0f}:{1} (score: {2}, depth: {3}, terminal positions: {4}, {5}ms, {6:.0f} terminals/second)"
             .format(len(hist) / 2, computermove, -score, _depth, terminals,
+                    elapsed_time_millis,
                     terminals / elapsed_time_millis * 1000))
 
         hist.append(hist[-1].move(move))
