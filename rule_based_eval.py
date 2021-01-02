@@ -92,29 +92,29 @@ class RuleBasedEvaluator(Evaluator):
     def score(self, pos, move):
         self.terminalsSeen = self.terminalsSeen + 1
 
-        i, j = move
-        pieceMoved, destinationSquareOccupant = pos.board[i], pos.board[j]
+        fromSquare, toSquare = move
+        pieceMoved, destinationSquareOccupant = pos.board[fromSquare], pos.board[toSquare]
 
         ##print(i, j, pieceMoved, destinationSquareOccupant)
 
         # Actual move
-        score = pst[pieceMoved][j] - pst[pieceMoved][i]
+        score = pst[pieceMoved][toSquare] - pst[pieceMoved][fromSquare]
         # Capture of a black piece
         if destinationSquareOccupant.islower():
-            score += pst[destinationSquareOccupant.upper()][119-j]
+            score += pst[destinationSquareOccupant.upper()][119-toSquare]
         # Castling check detection
-        if abs(j-pos.kp) < 2:
-            score += pst['K'][119-j]
+        if abs(toSquare-pos.kp) < 2:
+            score += pst['K'][119-toSquare]
         # Castling
-        if pieceMoved == 'K' and abs(i-j) == 2:
-            score += pst['R'][(i+j)//2]
-            score -= pst['R'][A1 if j < i else H1]
+        if pieceMoved == 'K' and abs(fromSquare-toSquare) == 2:
+            score += pst['R'][(fromSquare+toSquare)//2]
+            score -= pst['R'][A1 if toSquare < fromSquare else H1]
         # Special pawn stuff
         if pieceMoved == 'P':
-            if A8 <= j <= H8:
-                score += pst['Q'][j] - pst['P'][j]
-            if j == pos.ep:
-                score += pst['P'][119-(j+S)]
+            if A8 <= toSquare <= H8:
+                score += pst['Q'][toSquare] - pst['P'][toSquare]
+            if toSquare == pos.ep:
+                score += pst['P'][119-(toSquare+S)]
 
         # Apply rules
         delta = 0
@@ -123,7 +123,7 @@ class RuleBasedEvaluator(Evaluator):
             gameStage = GameStage.Middlegame
         if pos.half_moves > 80:
             gameStage = GameStage.Endgame
-        params = RuleParams(pos, move, i, j, pieceMoved,
+        params = RuleParams(pos, move, fromSquare, toSquare, pieceMoved,
                             destinationSquareOccupant, gameStage)
         for rule in self.rules:
             delta += rule(params)
