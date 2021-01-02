@@ -12,11 +12,11 @@ ConservativeEvaluator = RuleBasedEvaluator(
                                         'R': 500, 'Q': 900, 'K': 60000})],
     gameStageRules={
         GameStage.Opening: (
-            kingrules.mustBeAbleToCastle,
-            kingrules.noEarlyKingMoves,
+            kingrules.unableToCastle(-200),
+            kingrules.earlyKingMoves(-100),
             kingrules.castleKingside(40),
-            kingrules.castleQueenside,
-            queenrules.noEarlyQueenAdvance
+            kingrules.castleQueenside(30),
+            queenrules.earlyQueenAdvance(-50)
         )},
 )
 
@@ -26,10 +26,11 @@ MorphyEvaluator = RuleBasedEvaluator(
                                         'R': 500, 'Q': 900, 'K': 60000})],
     gameStageRules={
         GameStage.Opening: (
-            kingrules.mustBeAbleToCastle,
-            kingrules.noEarlyKingMoves,
-            kingrules.castleKingside(40),
-            kingrules.castleQueenside,
+            kingrules.unableToCastle(-200),
+            kingrules.earlyKingMoves(-300),
+            kingrules.castleKingside(50),
+            kingrules.castleQueenside(20),
+            queenrules.earlyQueenAdvance(20),
             developFast(110),
         )},
 )
