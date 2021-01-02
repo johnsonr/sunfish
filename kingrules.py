@@ -1,3 +1,3 @@
 
-def mustBeAbleToCastle(pos, move):
+def mustBeAbleToCastle(params):
     return 0

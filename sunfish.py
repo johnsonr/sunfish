@@ -12,6 +12,7 @@ from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A
 from evaluator import Evaluator
 from rule_based_eval import RuleBasedEvaluator
 from kingrules import mustBeAbleToCastle
+from queenrules import noEarlyQueenAdvance
 import sys
 
 ###############################################################################
@@ -323,7 +324,8 @@ def print_pos(pos):
 
 def main():
     evaluator = RuleBasedEvaluator([
-        mustBeAbleToCastle
+        mustBeAbleToCastle,
+        noEarlyQueenAdvance
     ]
     )
     hist = [Position(initial, 0, (True, True),
@@ -376,15 +378,12 @@ def main():
         computermove = render(119-move[0]) + render(119-move[1])
         print(
             "Computer - {0:.0f}:{1} (score: {2}, depth: {3}, terminal positions: {4}, {5}ms, {6:.0f} terminals/second)"
-            .format(len(hist) / 2, computermove, -score, _depth, terminals,
+            .format(len(hist) / 2, computermove, -score,
+                    _depth, terminals,
                     elapsed_time_millis,
                     terminals / elapsed_time_millis * 1000))
 
         hist.append(hist[-1].move(move))
-
-        # for rownum, row in enumerate(hist[-1].board):
-        #     for colnum, sq in enumerate(row):
-        #         print("{0}:{1}-{2}".format(rownum, colnum, sq), end=' ')
 
 
 if __name__ == '__main__':

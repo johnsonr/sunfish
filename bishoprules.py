@@ -1,0 +1,4 @@
+
+# Bad bishop
+
+# Bishop trap

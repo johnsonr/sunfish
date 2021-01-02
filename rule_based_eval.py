@@ -1,6 +1,10 @@
 from piece import piece, S, A1, A8, H8, H1
 from evaluator import Evaluator
 
+from collections import namedtuple
+RuleParams = namedtuple(
+    "RuleParams", "pos move i j pieceMoved destinationSquareOccupant")
+
 ###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
 ###############################################################################
@@ -103,8 +107,10 @@ class RuleBasedEvaluator(Evaluator):
 
         # Apply rules
         delta = 0
+        params = RuleParams(pos, move, i, j, pieceMoved,
+                            destinationSquareOccupant)
         for rule in self.rules:
-            delta += rule(pos, move)
+            delta += rule(params)
         # print("Delta from {0} rules is {1}".format(len(self.rules), delta))
         score += delta
 
@@ -112,7 +118,3 @@ class RuleBasedEvaluator(Evaluator):
 
     def terminals(self):
         return self.terminalsSeen
-
-
-def mustBeAbleToCastle(pos, move):
-    return 0
