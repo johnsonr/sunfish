@@ -19,6 +19,22 @@ initial = (
     '         \n'  # 110 -119
 )
 
+# Convert to a numeric square
+
+
+def toAlgebraic(sq):
+    # TODO make efficient with string formatting
+    return "{0}{1}".format(toFile(sq), toRank(sq))
+
+
+def toFile(sq):
+    return chr(ord("a") + sq % 10)
+
+
+def toRank(sq):
+    return (100 - sq) % 10
+
+
 # Lists of possible moves for each piece type.
 N, E, S, W = -10, 1, 10, -1
 directions = {
@@ -28,6 +44,8 @@ directions = {
     'R': (N, E, S, W),
     'Q': (N, E, S, W, N+E, S+E, S+W, N+W),
     'K': (N, E, S, W, N+E, S+E, S+W, N+W)
+
+
 }
 
 # Mate value must be greater than 8*queen + 2*(rook+knight+bishop)

@@ -2,8 +2,6 @@ from piece import piece, S, A1, A8, H8, H1
 from evaluator import Evaluator
 
 from collections import namedtuple
-RuleParams = namedtuple(
-    "RuleParams", "pos move i j pieceMoved destinationSquareOccupant")
 
 ###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
@@ -67,8 +65,13 @@ for k, table in pst.items():
     pst[k] = (0,)*20 + pst[k] + (0,)*20
 
 
-# A rule is a function taking position and move, producing a delta
+# A rule is a function taking position and move, producing a delta to the previous score
+# The aim is to see if the move makes the position better or worse for the mover
+RuleParams = namedtuple(
+    "RuleParams", "pos move fromSquare toSquare pieceMoved destinationSquareOccupant")
 
+
+# Evaluator using rules
 class RuleBasedEvaluator(Evaluator):
 
     terminalsSeen = 0
