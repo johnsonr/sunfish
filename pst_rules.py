@@ -1,14 +1,4 @@
 from piece import piece, S, A1, A8, H8, H1
-from evaluator import Evaluator
-
-from collections import namedtuple
-import enum
-
-
-class GameStage(enum.Enum):
-    Opening = 1
-    Middlegame = 2
-    Endgame = 3
 
 ###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
@@ -71,51 +61,6 @@ for k, table in pst.items():
     def padrow(row): return (0,) + tuple(x+piece[k] for x in row) + (0,)
     pst[k] = sum((padrow(table[i*8:i*8+8]) for i in range(8)), ())
     pst[k] = (0,)*20 + pst[k] + (0,)*20
-
-
-# A rule is a function taking position and move, producing a delta to the previous score
-# The aim is to see if the move makes the position better or worse for the mover
-RuleParams = namedtuple(
-    "RuleParams", "pos move fromSquare toSquare pieceMoved destinationSquareOccupant gameStage")
-
-
-class RuleBasedEvaluator(Evaluator):
-    # Evaluator using rules
-
-    terminalsSeen = 0
-
-    rules = []
-
-    def __init__(self, rules):
-        self.rules = rules
-
-    def score(self, pos, move):
-        self.terminalsSeen = self.terminalsSeen + 1
-        score = 0
-
-        fromSquare, toSquare = move
-        pieceMoved, destinationSquareOccupant = pos.board[fromSquare], pos.board[toSquare]
-
-        ##print(i, j, pieceMoved, destinationSquareOccupant)
-
-        # Apply rules
-        delta = 0
-        gameStage = GameStage.Opening
-        if pos.half_moves > 18:
-            gameStage = GameStage.Middlegame
-        if pos.half_moves > 80:
-            gameStage = GameStage.Endgame
-        params = RuleParams(pos, move, fromSquare, toSquare, pieceMoved,
-                            destinationSquareOccupant, gameStage)
-        for rule in self.rules:
-            delta += rule(params)
-        # print("Delta from {0} rules is {1}".format(len(self.rules), delta))
-        score += delta
-
-        return score
-
-    def terminals(self):
-        return self.terminalsSeen
 
 
 def pstRule(params):

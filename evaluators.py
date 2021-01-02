@@ -1,4 +1,5 @@
-from rule_based_eval import RuleBasedEvaluator, pstRule
+from rule_based_eval import RuleBasedEvaluator
+from pst_rules import pstRule
 from queenrules import noEarlyQueenAdvance
 import kingrules
 
