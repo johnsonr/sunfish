@@ -118,11 +118,11 @@ class RuleBasedEvaluator(Evaluator):
 
         # Apply rules
         delta = 0
-        gameStage = Opening
+        gameStage = GameStage.Opening
         if pos.half_moves > 18:
             gameStage = GameStage.Middlegame
-        if pos.half_moves > 80
-        gameStage = GameStage.Endgame
+        if pos.half_moves > 80:
+            gameStage = GameStage.Endgame
         params = RuleParams(pos, move, i, j, pieceMoved,
                             destinationSquareOccupant, gameStage)
         for rule in self.rules:
