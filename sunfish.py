@@ -10,7 +10,7 @@ from itertools import count
 from collections import namedtuple
 from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8, render
 from evaluator import Evaluator
-from evaluators import ConservativeEvaluator  # , MorphyEvaluator
+from evaluators import ConservativeEvaluator, MorphyEvaluator
 import sys
 
 ###############################################################################
@@ -316,9 +316,9 @@ def print_pos(pos):
 
 
 def main():
-    evaluator = ConservativeEvaluator
+    # evaluator = ConservativeEvaluator
 
-    #evaluator = MorphyEvaluator
+    evaluator = MorphyEvaluator
     hist = [Position(initial, 0, (True, True),
                      (True, True), 0, 0, evaluator, 0)]
 

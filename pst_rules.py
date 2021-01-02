@@ -58,7 +58,7 @@ DefaultPST = {
 def createPstRules(piece):
     # Create PST rules with default material
 
-    pst = DefaultPST
+    pst = DefaultPST.copy()
 
     # Pad tables and join piece and pst dictionaries
     for k, table in pst.items():
