@@ -17,13 +17,13 @@ ConservativeEvaluator = RuleBasedEvaluator([
 ]
 )
 
-# MorphyEvaluator = RuleBasedEvaluator([
-#     createPstRules(piece={'P': 100, 'N': 300, 'B': 310,
-#                           'R': 500, 'Q': 900, 'K': 60000}),
-#     kingrules.mustBeAbleToCastle,
-#     kingrules.noEarlyKingMoves,
-#     kingrules.castleKingside(40),
-#     kingrules.castleQueenside,
-#     developFast(110),
-# ]
-# )
+MorphyEvaluator = RuleBasedEvaluator([
+    createPstRules(piece={'P': 100, 'N': 300, 'B': 310,
+                          'R': 500, 'Q': 900, 'K': 60000}),
+    kingrules.mustBeAbleToCastle,
+    kingrules.noEarlyKingMoves,
+    kingrules.castleKingside(40),
+    kingrules.castleQueenside,
+    developFast(110),
+]
+)
