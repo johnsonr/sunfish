@@ -1,6 +1,7 @@
 ![Sunfish logo](https://raw.github.com/thomasahle/sunfish/master/logo/sunfish_large.png)
 
 ## Introduction
+
 Sunfish is a simple, but strong chess engine, written in Python, mostly for teaching purposes. Without tables and its simple interface, it takes up just 111 lines of code! (see [`compressed.py`](https://github.com/thomasahle/sunfish/blob/master/compressed.py)) Yet [it plays at ratings above 2000 at Lichess](https://lichess.org/@/sunfish-engine).
 
 Because Sunfish is small and strives to be simple, the code provides a great platform for experimenting. People have used it for testing parallel search algorithms, experimenting with evaluation functions, and developing deep learning chess programs. Fork it today and see what you can do!
@@ -8,7 +9,7 @@ Because Sunfish is small and strives to be simple, the code provides a great pla
 ## Screenshot
 
     My move: g8f6
-    
+
       8 ♖ ♘ ♗ ♕ ♔ ♗ · ♖
       7 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
       6 · · · · · ♘ · ·
@@ -53,7 +54,6 @@ An easy way to get a strong Sunfish is to run with with the [PyPy Just-In-Time i
        2 pypy3.6 (7.1)            47      35     300   56.7%   21.3%
        3 python3.7               -97      36     300   36.3%   20.7%
        4 python2.7              -109      35     300   34.8%   24.3%
-
 
 # Why Sunfish?
 
