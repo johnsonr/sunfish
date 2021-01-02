@@ -7,6 +7,7 @@ import queenrules
 # ClassicalEvaluator
 # Tarrasch style
 ConservativeEvaluator = RuleBasedEvaluator(
+    name="Classical:Tarrasch",
     generalRules=[
         createPstRules(piece={'P': 100, 'N': 300, 'B': 320,
                                         'R': 500, 'Q': 900, 'K': 60000})],
@@ -17,10 +18,15 @@ ConservativeEvaluator = RuleBasedEvaluator(
             kingrules.castleKingside(40),
             kingrules.castleQueenside(30),
             queenrules.earlyQueenAdvance(-50)
-        )},
+        ),
+        GameStage.Middlegame: (),
+        GameStage.Endgame: ()
+    },
+
 )
 
 MorphyEvaluator = RuleBasedEvaluator(
+    name="Romantic:Morphy",
     generalRules=[
         createPstRules(piece={'P': 100, 'N': 300, 'B': 310,
                                         'R': 500, 'Q': 900, 'K': 60000})],
@@ -32,5 +38,7 @@ MorphyEvaluator = RuleBasedEvaluator(
             kingrules.castleQueenside(20),
             queenrules.earlyQueenAdvance(20),
             developFast(110),
-        )},
+        ),
+        GameStage.Middlegame: (),
+        GameStage.Endgame: ()},
 )

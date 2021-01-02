@@ -322,7 +322,8 @@ def main():
     hist = [Position(initial, 0, (True, True),
                      (True, True), 0, 0, evaluator, 0)]
 
-    print("Seconds to think:", seconds_to_think)
+    print("{1} seconds to think, Evaluator: {0}".format(
+        evaluator, seconds_to_think))
     searcher = Searcher()
     while True:
         print_pos(hist[-1])

@@ -20,16 +20,22 @@ RuleParams = namedtuple(
 
 class RuleBasedEvaluator(Evaluator):
     # Evaluator using rules
+    # All positions are evaluated for white, being rotated before
 
-    terminalsSeen = 0
-
-    gameStageRules = []
-
-    generalRules = []
-
-    def __init__(self, generalRules, gameStageRules):
+    def __init__(self, name, generalRules, gameStageRules):
+        self.name = name
         self.generalRules = generalRules
         self.gameStageRules = gameStageRules
+        self.terminalsSeen = 0
+
+    def __str__(self):
+        return "{0}, {1} general rules, {2} opening rules, {3} middlegame rules, {4} endgame rules".format(
+            self.name, len(self.generalRules),
+            len(
+                self.gameStageRules[GameStage.Opening]),
+            len(
+                self.gameStageRules[GameStage.Middlegame]),
+            len(self.gameStageRules[GameStage.Endgame]))
 
     def score(self, pos, move):
         self.terminalsSeen = self.terminalsSeen + 1
@@ -37,8 +43,6 @@ class RuleBasedEvaluator(Evaluator):
 
         fromSquare, toSquare = move
         pieceMoved, destinationSquareOccupant = pos.board[fromSquare], pos.board[toSquare]
-
-        ##print(i, j, pieceMoved, destinationSquareOccupant)
 
         # Apply rules
         delta = 0
