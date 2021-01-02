@@ -1,11 +1,9 @@
-from piece import piece, S, A1, A8, H8, H1
+from piece import S, A1, A8, H8, H1
 
 ###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
 ###############################################################################
-
-
-pst = {
+DefaultPST = {
     'P': (0,   0,   0,   0,   0,   0,   0,   0,
           78,  83,  86,  73, 102,  82,  85,  90,
           7,  29,  21,  44,  40,  31,  44,   7,
@@ -56,32 +54,40 @@ pst = {
           17,  30,  -3, -14,   6,  -1,  40,  18),
 }
 
-# Pad tables and join piece and pst dictionaries
-for k, table in pst.items():
-    def padrow(row): return (0,) + tuple(x+piece[k] for x in row) + (0,)
-    pst[k] = sum((padrow(table[i*8:i*8+8]) for i in range(8)), ())
-    pst[k] = (0,)*20 + pst[k] + (0,)*20
 
+def createPstRules(piece):
+    # Create PST rules with default material
 
-def pstRule(params):
-    # Actual move
-    score = pst[params.pieceMoved][params.toSquare] - \
-        pst[params.pieceMoved][params.fromSquare]
-    # Capture of a black piece
-    if params.destinationSquareOccupant.islower():
-        score += pst[params.destinationSquareOccupant.upper()][119 -
-                                                               params.toSquare]
-    # Castling check detection
-    if abs(params.toSquare-params.pos.kp) < 2:
-        score += pst['K'][119-params.toSquare]
-    # Castling
-    if params.pieceMoved == 'K' and abs(params.fromSquare-params.toSquare) == 2:
-        score += pst['R'][(params.fromSquare+params.toSquare)//2]
-        score -= pst['R'][A1 if params.toSquare < params.fromSquare else H1]
-    # Special pawn stuff
-    if params.pieceMoved == 'P':
-        if A8 <= params.toSquare <= H8:
-            score += pst['Q'][params.toSquare] - pst['P'][params.toSquare]
-        if params.toSquare == params.pos.ep:
-            score += pst['P'][119-(params.toSquare+S)]
-    return score
+    pst = DefaultPST
+
+    # Pad tables and join piece and pst dictionaries
+    for k, table in pst.items():
+        def padrow(row): return (0,) + tuple(x+piece[k] for x in row) + (0,)
+        pst[k] = sum((padrow(table[i*8:i*8+8]) for i in range(8)), ())
+        pst[k] = (0,)*20 + pst[k] + (0,)*20
+
+    def pstRule(params):
+        # Actual move
+        score = pst[params.pieceMoved][params.toSquare] - \
+            pst[params.pieceMoved][params.fromSquare]
+        # Capture of a black piece
+        if params.destinationSquareOccupant.islower():
+            score += pst[params.destinationSquareOccupant.upper()][119 -
+                                                                   params.toSquare]
+        # Castling check detection
+        if abs(params.toSquare-params.pos.kp) < 2:
+            score += pst['K'][119-params.toSquare]
+        # Castling
+        if params.pieceMoved == 'K' and abs(params.fromSquare-params.toSquare) == 2:
+            score += pst['R'][(params.fromSquare+params.toSquare)//2]
+            score -= pst['R'][A1 if params.toSquare <
+                              params.fromSquare else H1]
+        # Special pawn stuff
+        if params.pieceMoved == 'P':
+            if A8 <= params.toSquare <= H8:
+                score += pst['Q'][params.toSquare] - pst['P'][params.toSquare]
+            if params.toSquare == params.pos.ep:
+                score += pst['P'][119-(params.toSquare+S)]
+        return score
+
+    return pstRule
