@@ -78,8 +78,9 @@ for k, table in pst.items():
 RuleParams = namedtuple(
     "RuleParams", "pos move fromSquare toSquare pieceMoved destinationSquareOccupant gameStage")
 
-
 # Evaluator using rules
+
+
 class RuleBasedEvaluator(Evaluator):
 
     terminalsSeen = 0
@@ -91,30 +92,12 @@ class RuleBasedEvaluator(Evaluator):
 
     def score(self, pos, move):
         self.terminalsSeen = self.terminalsSeen + 1
+        score = 0
 
         fromSquare, toSquare = move
         pieceMoved, destinationSquareOccupant = pos.board[fromSquare], pos.board[toSquare]
 
         ##print(i, j, pieceMoved, destinationSquareOccupant)
-
-        # Actual move
-        score = pst[pieceMoved][toSquare] - pst[pieceMoved][fromSquare]
-        # Capture of a black piece
-        if destinationSquareOccupant.islower():
-            score += pst[destinationSquareOccupant.upper()][119-toSquare]
-        # Castling check detection
-        if abs(toSquare-pos.kp) < 2:
-            score += pst['K'][119-toSquare]
-        # Castling
-        if pieceMoved == 'K' and abs(fromSquare-toSquare) == 2:
-            score += pst['R'][(fromSquare+toSquare)//2]
-            score -= pst['R'][A1 if toSquare < fromSquare else H1]
-        # Special pawn stuff
-        if pieceMoved == 'P':
-            if A8 <= toSquare <= H8:
-                score += pst['Q'][toSquare] - pst['P'][toSquare]
-            if toSquare == pos.ep:
-                score += pst['P'][119-(toSquare+S)]
 
         # Apply rules
         delta = 0
@@ -134,3 +117,27 @@ class RuleBasedEvaluator(Evaluator):
 
     def terminals(self):
         return self.terminalsSeen
+
+
+def pstRule(params):
+    # Actual move
+    score = pst[params.pieceMoved][params.toSquare] - \
+        pst[params.pieceMoved][params.fromSquare]
+    # Capture of a black piece
+    if params.destinationSquareOccupant.islower():
+        score += pst[params.destinationSquareOccupant.upper()][119 -
+                                                               params.toSquare]
+    # Castling check detection
+    if abs(params.toSquare-params.pos.kp) < 2:
+        score += pst['K'][119-params.toSquare]
+    # Castling
+    if params.pieceMoved == 'K' and abs(params.fromSquare-params.toSquare) == 2:
+        score += pst['R'][(params.fromSquare+params.toSquare)//2]
+        score -= pst['R'][A1 if params.toSquare < params.fromSquare else H1]
+    # Special pawn stuff
+    if params.pieceMoved == 'P':
+        if A8 <= params.toSquare <= H8:
+            score += pst['Q'][params.toSquare] - pst['P'][params.toSquare]
+        if params.toSquare == params.pos.ep:
+            score += pst['P'][119-(params.toSquare+S)]
+    return score
