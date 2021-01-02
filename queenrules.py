@@ -2,7 +2,7 @@ from piece import toAlgebraic
 
 
 def noEarlyQueenAdvance(params):
-    if params.pos.half_moves > 18:
+    if params.gameStage != GameStage.Opening:
         print("too late at ", params.pos.half_moves)
         return 0
 

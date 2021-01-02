@@ -2,10 +2,18 @@ from piece import piece, S, A1, A8, H8, H1
 from evaluator import Evaluator
 
 from collections import namedtuple
+import enum
+
+
+class GameStage(enum.Enum):
+    Opening = 1
+    Middlegame = 2
+    Endgame = 3
 
 ###############################################################################
 # Piece-Square tables. Tune these to change sunfish's behaviour
 ###############################################################################
+
 
 pst = {
     'P': (0,   0,   0,   0,   0,   0,   0,   0,
@@ -68,7 +76,7 @@ for k, table in pst.items():
 # A rule is a function taking position and move, producing a delta to the previous score
 # The aim is to see if the move makes the position better or worse for the mover
 RuleParams = namedtuple(
-    "RuleParams", "pos move fromSquare toSquare pieceMoved destinationSquareOccupant")
+    "RuleParams", "pos move fromSquare toSquare pieceMoved destinationSquareOccupant gameStage")
 
 
 # Evaluator using rules
@@ -110,8 +118,13 @@ class RuleBasedEvaluator(Evaluator):
 
         # Apply rules
         delta = 0
+        gameStage = Opening
+        if pos.half_moves > 18:
+            gameStage = GameStage.Middlegame
+        if pos.half_moves > 80
+        gameStage = GameStage.Endgame
         params = RuleParams(pos, move, i, j, pieceMoved,
-                            destinationSquareOccupant)
+                            destinationSquareOccupant, gameStage)
         for rule in self.rules:
             delta += rule(params)
         # print("Delta from {0} rules is {1}".format(len(self.rules), delta))
