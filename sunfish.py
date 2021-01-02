@@ -8,9 +8,9 @@ from time import time
 
 from itertools import count
 from collections import namedtuple
-from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8
+from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8, render
 from evaluator import Evaluator
-from evaluators import DefaultEvaluator
+from evaluators import ConservativeEvaluator
 import sys
 
 ###############################################################################
@@ -306,12 +306,6 @@ def parse(c):
     return A1 + fil - 10*rank
 
 
-# Render as algebraic
-def render(i):
-    rank, fil = divmod(i - A1, 10)
-    return chr(fil + ord('a')) + str(-rank + 1)
-
-
 def print_pos(pos):
     print()
     uni_pieces = {'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚', 'P': '♟',
@@ -322,7 +316,7 @@ def print_pos(pos):
 
 
 def main():
-    evaluator = DefaultEvaluator
+    evaluator = ConservativeEvaluator
     hist = [Position(initial, 0, (True, True),
                      (True, True), 0, 0, evaluator, 0)]
 

@@ -3,9 +3,7 @@ piece = {'P': 100, 'N': 280, 'B': 320, 'R': 479, 'Q': 929, 'K': 60000}
 
 # Our board is represented as a 120 character string. The padding allows for
 # fast detection of moves that don't stay within the board.
-A1, H1, A8, H8 = 91, 98, 21, 28
-
-G1 = 97
+A1, C1, G1, H1, A8, H8 = 91, 93, 97, 98, 21, 28
 
 initial = (
     '         \n'  # 0 -  9

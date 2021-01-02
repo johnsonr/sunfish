@@ -1,10 +1,14 @@
 from rule_based_eval import RuleBasedEvaluator
 from queenrules import noEarlyQueenAdvance
-from kingrules import mustBeAbleToCastle, noEarlyKingMoves
+import kingrules
 
-DefaultEvaluator = RuleBasedEvaluator([
-    mustBeAbleToCastle,
-    noEarlyKingMoves,
+# ClassicalEvaluator
+# Tarrasch style
+ConservativeEvaluator = RuleBasedEvaluator([
+    kingrules.mustBeAbleToCastle,
+    kingrules.noEarlyKingMoves,
+    kingrules.castleKingside(40),
+    kingrules.castleQueenside,
     noEarlyQueenAdvance
 ]
 )

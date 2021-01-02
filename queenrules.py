@@ -3,7 +3,7 @@ from rule_based_eval import GameStage
 
 def noEarlyQueenAdvance(params):
     if params.gameStage != GameStage.Opening:
-        print("too late to worry about queen advance at ", params.pos.half_moves)
+        # print("too late to worry about queen advance at ", params.pos.half_moves)
         return 0
 
     if params.pieceMoved == 'Q':
