@@ -39,7 +39,7 @@ DRAW_TEST = True
 # Chess logic
 ###############################################################################
 
-class Position(namedtuple('Position', 'board score wc bc ep kp evaluator')):
+class Position(namedtuple('Position', 'board score wc bc ep kp evaluator half_moves')):
     """ A state of a chess game
     board -- a 120 char representation of the board
     score -- the board evaluation
@@ -87,14 +87,14 @@ class Position(namedtuple('Position', 'board score wc bc ep kp evaluator')):
             self.board[::-1].swapcase(), -self.score, self.bc, self.wc,
             119-self.ep if self.ep else 0,
             119-self.kp if self.kp else 0,
-            self.evaluator)
+            self.evaluator, self.half_moves)
 
     def nullmove(self):
         ''' Like rotate, but clears ep and kp '''
         return Position(
             self.board[::-1].swapcase(), -self.score,
             self.bc, self.wc, 0, 0,
-            self.evaluator)
+            self.evaluator, self.half_moves)
 
     def move(self, move):
         i, j = move
@@ -132,7 +132,7 @@ class Position(namedtuple('Position', 'board score wc bc ep kp evaluator')):
             if j == self.ep:
                 board = put(board, j+S, '.')
         # We rotate the returned position, so it's ready for the next player
-        return Position(board, score, wc, bc, ep, kp, self.evaluator).rotate()
+        return Position(board, score, wc, bc, ep, kp, self.evaluator, self.half_moves + 1).rotate()
 
     # Scoring function
     def value(self, move):
@@ -329,7 +329,7 @@ def main():
     ]
     )
     hist = [Position(initial, 0, (True, True),
-                     (True, True), 0, 0, evaluator)]
+                     (True, True), 0, 0, evaluator, 0)]
 
     print("Seconds to think:", seconds_to_think)
     searcher = Searcher()
