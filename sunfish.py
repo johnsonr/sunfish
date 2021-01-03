@@ -148,7 +148,8 @@ Entry = namedtuple('Entry', 'lower upper')
 
 
 class Searcher:
-    def __init__(self):
+    def __init__(self, evaluator):
+        self.evaluator = evaluator
         self.tp_score = {}
         self.tp_move = {}
         self.history = set()
@@ -262,10 +263,10 @@ class Searcher:
 
         return best
 
-    def search(self, pos, evaluator, history=()):
+    def search(self, pos, history=()):
         """ Iterative deepening MTD-bi search """
         self.nodes = 0
-        alreadyEvaluated = evaluator.terminals()
+        alreadyEvaluated = self.evaluator.terminals()
         if DRAW_TEST:
             self.history = set(history)
             # print('# Clearing table due to new history')
@@ -291,7 +292,7 @@ class Searcher:
             self.bound(pos, lower, depth)
             # If the game hasn't finished we can retrieve our move from the
             # transposition table.
-            yield depth, self.tp_move.get(pos), self.tp_score.get((pos, depth, True)).lower, evaluator.terminals() - alreadyEvaluated
+            yield depth, self.tp_move.get(pos), self.tp_score.get((pos, depth, True)).lower, self.evaluator.terminals() - alreadyEvaluated
 
 
 ###############################################################################
@@ -326,7 +327,7 @@ def main():
 
     print("{1} seconds to think, Evaluator: {0}".format(
         evaluator, seconds_to_think))
-    searcher = Searcher()
+    searcher = Searcher(evaluator)
     while True:
         print_pos(hist[-1])
 
@@ -358,7 +359,7 @@ def main():
         start = int(time() * 1000)
         elapsed_time_millis = 0
         milliseconds_to_think = 1000 * seconds_to_think
-        for _depth, move, score, terminals in searcher.search(hist[-1], evaluator, hist):
+        for _depth, move, score, terminals in searcher.search(hist[-1], hist):
             timenow = int(time() * 1000)
             elapsed_time_millis = timenow - start
             if elapsed_time_millis > milliseconds_to_think:

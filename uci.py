@@ -12,8 +12,11 @@ import argparse
 
 import tools
 import sunfish
+import evaluators
 
 from tools import WHITE, BLACK, Unbuffered
+
+evaluator = evaluators.MorphyEvaluator
 
 
 def main():
@@ -117,7 +120,8 @@ def main():
 
             start = time.time()
             ponder = None
-            for sdepth, _move, _score in searcher.search(pos):
+            logging.debug("about to search")
+            for sdepth, _move, _score in searcher.search(pos, evaluator):
                 moves = tools.pv(searcher, pos, include_scores=False)
 
                 if show_thinking:
