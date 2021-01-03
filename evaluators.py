@@ -1,6 +1,6 @@
 from rule_based_eval import RuleBasedEvaluator, GameStage
 from pst_rules import createPstRules
-from playsharp_rules import developFast
+import playsharp_rules
 import kingrules
 import queenrules
 
@@ -36,8 +36,9 @@ MorphyEvaluator = RuleBasedEvaluator(
             kingrules.earlyKingMoves(-300),
             kingrules.castleKingside(50),
             kingrules.castleQueenside(20),
-            queenrules.earlyQueenAdvance(20),
-            developFast(110),
+            queenrules.earlyQueenAdvance(10),
+            playsharp_rules.developFast(60),
+            playsharp_rules.occupyCenter(40),
         ),
         GameStage.Middlegame: (),
         GameStage.Endgame: ()},

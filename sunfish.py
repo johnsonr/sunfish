@@ -6,6 +6,8 @@ import re
 import sys
 from time import time
 
+import logging
+
 from itertools import count
 from collections import namedtuple
 from piece import initial, MATE_LOWER, MATE_UPPER, directions, N, W, E, S, A1, A8, H1, H8, render
@@ -265,6 +267,7 @@ class Searcher:
 
     def search(self, pos, history=()):
         """ Iterative deepening MTD-bi search """
+
         self.nodes = 0
         alreadyEvaluated = self.evaluator.terminals()
         if DRAW_TEST:
@@ -275,6 +278,8 @@ class Searcher:
         # In finished games, we could potentially go far enough to cause a recursion
         # limit exception. Hence we bound the ply.
         for depth in range(1, 1000):
+            logging.debug("In for {0}".format(depth))
+
             # The inner loop is a binary search on the score of the position.
             # Inv: lower <= score <= upper
             # 'while lower != upper' would work, but play tests show a margin of 20 plays
@@ -292,7 +297,11 @@ class Searcher:
             self.bound(pos, lower, depth)
             # If the game hasn't finished we can retrieve our move from the
             # transposition table.
-            yield depth, self.tp_move.get(pos), self.tp_score.get((pos, depth, True)).lower, self.evaluator.terminals() - alreadyEvaluated
+            moveGotten = self.tp_move.get(pos)
+            score = self.tp_score.get((pos, depth, True)).lower
+            newTerminals = self.evaluator.terminals() - alreadyEvaluated
+
+            yield depth, moveGotten, score, newTerminals
 
 
 ###############################################################################
