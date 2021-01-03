@@ -4,9 +4,11 @@ import time
 import sys
 
 from pst_rules import createScorer
-import evaluators
 import sunfish
 
+import evaluators
+
+# TODO this should come from searcher
 evaluator = evaluators.MorphyEvaluator
 
 
@@ -26,7 +28,7 @@ def search(searcher, pos, secs, history=()):
     """ This used to be in the Searcher class """
     start = time.time()
     print("searching")
-    for depth, move, score in searcher.search(pos, evaluator, history):
+    for depth, move, score in searcher.search(pos, history):
         if time.time() - start > secs:
             break
     return move, score, depth

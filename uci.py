@@ -11,7 +11,7 @@ import logging
 import argparse
 
 import tools
-import sunfish
+from sunfish import Searcher
 import evaluators
 
 from tools import WHITE, BLACK, Unbuffered
@@ -38,8 +38,10 @@ def main():
     def output(line):
         print(line, file=out)
         logging.debug(line)
+
     pos = tools.parseFEN(tools.FEN_INITIAL)
-    searcher = sunfish.Searcher()
+    searcher = Searcher(evaluator)
+
     color = WHITE
     our_time, opp_time = 1000, 1000  # time in centi-seconds
     show_thinking = True
@@ -121,7 +123,8 @@ def main():
             start = time.time()
             ponder = None
             logging.debug("about to search")
-            for sdepth, _move, _score in searcher.search(pos, evaluator):
+            for sdepth, _move, _score in searcher.search(pos):
+                logging.debug("search returned")
                 moves = tools.pv(searcher, pos, include_scores=False)
 
                 if show_thinking:
