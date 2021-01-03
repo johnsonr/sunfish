@@ -55,9 +55,7 @@ DefaultPST = {
 }
 
 
-def createPstRules(piece):
-    # Create PST rules with default material
-
+def createPst(piece):
     pst = DefaultPST.copy()
 
     # Pad tables and join piece and pst dictionaries
@@ -65,6 +63,23 @@ def createPstRules(piece):
         def padrow(row): return (0,) + tuple(x+piece[k] for x in row) + (0,)
         pst[k] = sum((padrow(table[i*8:i*8+8]) for i in range(8)), ())
         pst[k] = (0,)*20 + pst[k] + (0,)*20
+    return pst
+
+
+def createScorer(piece):
+    pst = createPst(piece)
+
+    def scorer(board):
+        score = 0
+        score = sum(pst[p][i] for i, p in enumerate(board) if p.isupper())
+        score -= sum(pst[p.upper()][119-i]
+                     for i, p in enumerate(board) if p.islower())
+        return score
+    return scorer
+
+
+def createPstRules(piece):
+    pst = createPst(piece)
 
     def pstRule(params):
         # Actual move

@@ -45,6 +45,8 @@ class Position(namedtuple('Position', 'board score wc bc ep kp evaluator half_mo
     bc -- the opponent castling rights, [west/king side, east/queen side]
     ep - the en passant square
     kp - the king passant square
+    evaluator - evaluator to use
+    half_moves - completed half moves
     """
 
     def gen_moves(self):

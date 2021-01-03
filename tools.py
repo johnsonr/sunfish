@@ -3,7 +3,12 @@ import re
 import time
 import sys
 
+from pst_rules import createScorer
+import evaluators
 import sunfish
+
+evaluator = evaluators.MorphyEvaluator
+
 
 ################################################################################
 # This module contains functions used by test.py and xboard.py.
@@ -38,20 +43,25 @@ def gen_legal_moves(pos):
         if not can_kill_king(pos1):
             yield move, pos1
 
+
 def can_kill_king(pos):
     # If we just checked for opponent moves capturing the king, we would miss
     # captures in case of illegal castling.
     return any(pos.value(m) >= sunfish.MATE_LOWER for m in pos.gen_moves())
 
+
 def mrender(pos, m):
     # Sunfish always assumes promotion to queen
-    p = 'q' if sunfish.A8 <= m[1] <= sunfish.H8 and pos.board[m[0]] == 'P' else ''
+    p = 'q' if sunfish.A8 <= m[1] <= sunfish.H8 and pos.board[m[0]
+                                                              ] == 'P' else ''
     m = m if get_color(pos) == WHITE else (119-m[0], 119-m[1])
     return sunfish.render(m[0]) + sunfish.render(m[1]) + p
+
 
 def mparse(color, move):
     m = (sunfish.parse(move[0:2]), sunfish.parse(move[2:4]))
     return m if color == WHITE else (119-m[0], 119-m[1])
+
 
 def renderSAN(pos, move):
     ''' Assumes board is rotated to position of current player '''
@@ -62,7 +72,7 @@ def renderSAN(pos, move):
         csrc, cdst = sunfish.render(119-i), sunfish.render(119-j)
     # Check
     pos1 = pos.move(move)
-    cankill = lambda p: any(p.board[b]=='k' for a,b in p.gen_moves())
+    def cankill(p): return any(p.board[b] == 'k' for a, b in p.gen_moves())
     check = ''
     if cankill(pos1.rotate()):
         check = '+'
@@ -80,18 +90,26 @@ def renderSAN(pos, move):
         cap = csrc[0] + 'x' if pos.board[j] != '.' or j == pos.ep else ''
         return cap + cdst + pro + check
     # Figure out what files and ranks we need to include
-    srcs = [a for (a,b),_ in gen_legal_moves(pos) if pos.board[a] == pos.board[i] and b == j]
-    srcs_file = [a for a in srcs if (a - sunfish.A1) % 10 == (i - sunfish.A1) % 10]
-    srcs_rank = [a for a in srcs if (a - sunfish.A1) // 10 == (i - sunfish.A1) // 10]
+    srcs = [a for (a, b), _ in gen_legal_moves(
+        pos) if pos.board[a] == pos.board[i] and b == j]
+    srcs_file = [a for a in srcs if (
+        a - sunfish.A1) % 10 == (i - sunfish.A1) % 10]
+    srcs_rank = [a for a in srcs if (
+        a - sunfish.A1) // 10 == (i - sunfish.A1) // 10]
     assert srcs, 'No moves compatible with {}'.format(move)
-    if len(srcs) == 1: src = ''
-    elif len(srcs_file) == 1: src = csrc[0]
-    elif len(srcs_rank) == 1: src = csrc[1]
-    else: src = csrc
+    if len(srcs) == 1:
+        src = ''
+    elif len(srcs_file) == 1:
+        src = csrc[0]
+    elif len(srcs_rank) == 1:
+        src = csrc[1]
+    else:
+        src = csrc
     # Normal moves
     p = pos.board[i]
     cap = 'x' if pos.board[j] != '.' else ''
     return p + src + cap + cdst + check
+
 
 def parseSAN(pos, msan):
     ''' Assumes board is rotated to position of current player '''
@@ -103,7 +121,8 @@ def parseSAN(pos, msan):
     # Pawn moves
     pawn = re.match('([a-h])?x?([a-h][1-8])', msan)
     if pawn:
-        assert not re.search('[RBN]$', msan), 'Sunfish only supports queen promotion in {}'.format(msan)
+        assert not re.search(
+            '[RBN]$', msan), 'Sunfish only supports queen promotion in {}'.format(msan)
         p, (fil, dst) = 'P', pawn.groups()
         src = (fil or '[a-h]')+'[1-8]'
     # Castling
@@ -116,11 +135,13 @@ def parseSAN(pos, msan):
     for (i, j), _ in gen_legal_moves(pos):
         if get_color(pos) == WHITE:
             csrc, cdst = sunfish.render(i), sunfish.render(j)
-        else: csrc, cdst = sunfish.render(119-i), sunfish.render(119-j)
-        if pos.board[i] == p and re.match(dst,cdst) and re.match(src,csrc):
+        else:
+            csrc, cdst = sunfish.render(119-i), sunfish.render(119-j)
+        if pos.board[i] == p and re.match(dst, cdst) and re.match(src, csrc):
             return (i, j)
     assert False, 'Couldn\'t find legal move matching {}. Had {}'.format(msan, {
-        'p':p, 'src':src, 'dst': dst, 'mvs':list(gen_legal_moves(pos))})
+        'p': p, 'src': src, 'dst': dst, 'mvs': list(gen_legal_moves(pos))})
+
 
 def readPGN(file):
     """ Yields a number of [(pos, move), ...] lists. """
@@ -157,22 +178,30 @@ def get_color(pos):
     ''' A slightly hacky way to to get the color from a sunfish position '''
     return BLACK if pos.board.startswith('\n') else WHITE
 
+
 def parseFEN(fen):
     """ Parses a string in Forsyth-Edwards Notation into a Position """
     board, color, castling, enpas, _hclock, _fclock = fen.split()
     board = re.sub(r'\d', (lambda m: '.'*int(m.group(0))), board)
     board = list(21*' ' + '  '.join(board.split('/')) + 21*' ')
     board[9::10] = ['\n']*12
-    #if color == 'w': board[::10] = ['\n']*12
-    #if color == 'b': board[9::10] = ['\n']*12
+    # if color == 'w': board[::10] = ['\n']*12
+    # if color == 'b': board[9::10] = ['\n']*12
     board = ''.join(board)
     wc = ('Q' in castling, 'K' in castling)
     bc = ('k' in castling, 'q' in castling)
     ep = sunfish.parse(enpas) if enpas != '-' else 0
-    score = sum(sunfish.pst[p][i] for i,p in enumerate(board) if p.isupper())
-    score -= sum(sunfish.pst[p.upper()][119-i] for i,p in enumerate(board) if p.islower())
-    pos = sunfish.Position(board, score, wc, bc, ep, 0)
+
+    # This is static scoring
+    scorer = createScorer(piece={'P': 100, 'N': 300, 'B': 310,
+                                 'R': 500, 'Q': 900, 'K': 60000})
+    # score = sum(sunfish.pst[p][i] for i, p in enumerate(board) if p.isupper())
+    # score -= sum(sunfish.pst[p.upper()][119-i]
+    #              for i, p in enumerate(board) if p.islower())
+    score = scorer(board)
+    pos = sunfish.Position(board, score, wc, bc, ep, 0, evaluator, 0)
     return pos if color == 'w' else pos.rotate()
+
 
 def renderFEN(pos, half_move_clock=0, full_move_clock=1):
     color = 'wb'[get_color(pos)]
@@ -185,8 +214,9 @@ def renderFEN(pos, half_move_clock=0, full_move_clock=1):
     clock = '{} {}'.format(half_move_clock, full_move_clock)
     return ' '.join((board, color, castling, ep, clock))
 
+
 def parseEPD(epd, opt_dict=False):
-    epd = epd.strip('\n ;').replace('"','')
+    epd = epd.strip('\n ;').replace('"', '')
     parts = epd.split(maxsplit=6)
     opt_part = ''
     if len(parts) >= 6 and parts[4].isdigit() and parts[5].isdigit():
@@ -205,6 +235,7 @@ def parseEPD(epd, opt_dict=False):
 ################################################################################
 # Pretty print
 ################################################################################
+
 
 def pv(searcher, pos, include_scores=True, include_loop=False):
     res = []
@@ -226,18 +257,20 @@ def pv(searcher, pos, include_scores=True, include_loop=False):
             break
         seen_pos.add(pos)
         if include_scores:
-            res.append(str(pos.score if color==origc else -pos.score))
+            res.append(str(pos.score if color == origc else -pos.score))
     return ' '.join(res)
 
 ################################################################################
 # Bulk move generation
 ################################################################################
 
+
 def expand_position(pos):
     ''' Yields a tree of generators [p, [p, [...], ...], ...] rooted at pos '''
     yield pos
     for _, pos1 in gen_legal_moves(pos):
         yield expand_position(pos1)
+
 
 def collect_tree_depth(tree, depth):
     ''' Yields positions exactly at depth '''
@@ -248,6 +281,7 @@ def collect_tree_depth(tree, depth):
         for subtree in tree:
             for pos in collect_tree_depth(subtree, depth-1):
                 yield pos
+
 
 def flatten_tree(tree, depth):
     ''' Yields positions exactly at less than depth '''
@@ -263,14 +297,17 @@ def flatten_tree(tree, depth):
 ################################################################################
 
 # Disable buffering
+
+
 class Unbuffered(object):
     def __init__(self, stream):
         self.stream = stream
+
     def write(self, data):
         self.stream.write(data)
         self.stream.flush()
         sys.stderr.write(data)
         sys.stderr.flush()
+
     def __getattr__(self, attr):
         return getattr(self.stream, attr)
-

@@ -15,26 +15,30 @@ import sunfish
 
 from tools import WHITE, BLACK, Unbuffered
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('module', help='sunfish.py file (without .py)', type=str, default='sunfish', nargs='?')
-    parser.add_argument('--tables', metavar='pst', help='alternative pst table', type=str, default=None)
+    parser.add_argument('module', help='sunfish.py file (without .py)',
+                        type=str, default='sunfish', nargs='?')
+    parser.add_argument('--tables', metavar='pst',
+                        help='alternative pst table', type=str, default=None)
     args = parser.parse_args()
 
     sunfish = importlib.import_module(args.module)
-    if args.tables is not None:
-        pst_module = importlib.import_module(args.tables)
-        sunfish.pst = pst_module.pst
+    # if args.tables is not None:
+    #     pst_module = importlib.import_module(args.tables)
+    #     sunfish.pst = pst_module.pst
 
     logging.basicConfig(filename='sunfish.log', level=logging.DEBUG)
     out = Unbuffered(sys.stdout)
+
     def output(line):
         print(line, file=out)
         logging.debug(line)
     pos = tools.parseFEN(tools.FEN_INITIAL)
     searcher = sunfish.Searcher()
     color = WHITE
-    our_time, opp_time = 1000, 1000 # time in centi-seconds
+    our_time, opp_time = 1000, 1000  # time in centi-seconds
     show_thinking = True
 
     stack = []
@@ -121,7 +125,8 @@ def main():
                     score = int(round((entry.lower + entry.upper)/2))
                     usedtime = int((time.time() - start) * 1000)
                     moves_str = moves if len(moves) < 15 else ''
-                    output('info depth {} score cp {} time {} nodes {} pv {}'.format(sdepth, score, usedtime, searcher.nodes, moves_str))
+                    output('info depth {} score cp {} time {} nodes {} pv {}'.format(
+                        sdepth, score, usedtime, searcher.nodes, moves_str))
 
                 if len(moves) > 5:
                     ponder = moves[1]
@@ -156,6 +161,6 @@ def main():
         else:
             pass
 
+
 if __name__ == '__main__':
     main()
-
