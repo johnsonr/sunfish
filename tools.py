@@ -25,7 +25,7 @@ FEN_INITIAL = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 def search(searcher, pos, secs, history=()):
     """ This used to be in the Searcher class """
     start = time.time()
-    for depth, move, score in searcher.search(pos, history):
+    for depth, move, score in searcher.search(pos, evaluator, history):
         if time.time() - start > secs:
             break
     return move, score, depth
